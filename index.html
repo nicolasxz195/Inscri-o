@@ -11,6 +11,7 @@ body{
   margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,#0b0b0b 0%,#111 100%);
   font-family:Inter,system-ui,Arial;color:var(--accent);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
 .wrap{width:100%;max-width:680px;padding:32px;animation:fadeIn .6s ease both}
 .card{
@@ -34,7 +35,6 @@ textarea,input[type=text]{
   transition:box-shadow .18s,transform .12s,border-color .16s;min-height:72px;resize:vertical;
 }
 textarea:focus,input[type=text]:focus{border-color:#fff;transform:translateY(-2px);box-shadow:0 6px 24px var(--focus)}
-
 .radio-row{display:flex;gap:18px;margin-top:6px}
 .radio-row label{font-weight:500;color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}
 input[type=radio]{width:16px;height:16px}
@@ -43,7 +43,7 @@ input[type=radio]{width:16px;height:16px}
   margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(15px);
   transition:opacity var(--fade),transform var(--fade),max-height var(--fade);
 }
-.extra.show{max-height:260px;opacity:1;transform:translateY(0)}
+.extra.show{max-height:300px;opacity:1;transform:translateY(0)}
 
 .actions{text-align:center;margin-top:22px}
 .btn{
@@ -51,7 +51,6 @@ input[type=radio]{width:16px;height:16px}
   font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 6px 18px rgba(0,0,0,.5);
 }
 .btn:hover{background:#fff;color:#000;border-color:#000}
-
 .success{text-align:center;margin-top:20px;display:none}
 
 @keyframes fadeIn{
@@ -62,56 +61,167 @@ input[type=radio]{width:16px;height:16px}
 </head>
 <body>
 <div class="wrap">
-<div class="card">
+  <div class="card">
+    <div class="intro">Preencha o formulário para se inscrever</div>
+    <h1>Inscrição</h1>
 
-<div class="intro">Preencha o formulário para se inscrever</div>
-<h1>Inscrição</h1>
+    <form id="form">
+      <!-- Q1 -->
+      <label>Você já foi staff de um server?</label>
+      <div class="radio-row">
+        <label><input type="radio" name="staff" value="Sim" required> Sim</label>
+        <label><input type="radio" name="staff" value="Não" required> Não</label>
+      </div>
+      <div id="q1extra" class="extra" aria-hidden="true"></div>
 
-<form id="form">
-<label>Você já foi staff de um server?</label>
-<div class="radio-row">
-  <label><input type="radio" name="staff" value="Sim" required> Sim</label>
-  <label><input type="radio" name="staff" value="Não" required> Não</label>
-</div>
+      <!-- Q2 -->
+      <label>Como você reagiria com uma briga no servidor?</label>
+      <textarea id="q2" name="briga" placeholder="Explique..." required></textarea>
+      <div id="q2extraBox" class="extra" aria-hidden="true">
+        <label for="q2extra">Mas e se não funcionar?</label>
+        <textarea id="q2extra" name="q2extra" placeholder="O que faria então?"></textarea>
+      </div>
 
-<label>Como você reagiria com uma briga no servidor?</label>
-<textarea id="q2" name="briga" placeholder="Explique..." required></textarea>
+      <!-- Q3 -->
+      <label>Quais são suas melhores qualidades? (Relacionado ao server)</label>
+      <textarea id="q3" name="melhores" placeholder="Fale sobre suas qualidades..." required></textarea>
+      <div id="q3extra" class="extra" aria-hidden="true"></div>
 
-<div id="extraContainer" class="extra">
-  <label>Mas e se não funcionar?</label>
-  <textarea id="q2extra" name="q2extra" placeholder="O que faria então?"></textarea>
-</div>
+      <!-- Q4 -->
+      <label>Suas piores qualidades? (Relacionado ao server)</label>
+      <textarea id="q4" name="piores" placeholder="Fale sobre suas piores qualidades..." required></textarea>
+      <div id="q4extra" class="extra" aria-hidden="true"></div>
 
-<label>Quais são suas melhores qualidades?</label>
-<textarea name="melhores" required></textarea>
+      <!-- Q5 -->
+      <label>Que salário você deseja? (Não seja muito por favor)</label>
+      <input id="q5" type="text" name="salario" placeholder="Ex.: 100 Robux por mês" required>
+      <div id="q5extra" class="extra" aria-hidden="true"></div>
 
-<label>Suas piores qualidades?</label>
-<textarea name="piores" required></textarea>
+      <div class="actions"><button class="btn" id="submit">Enviar</button></div>
+    </form>
 
-<label>Que salário você deseja?</label>
-<input type="text" name="salario" required>
-
-<div class="actions"><button class="btn" id="submit">Enviar</button></div>
-</form>
-
-<div class="success" id="success">
-<h2>Formulário enviado!</h2>
-<a class="btn" href="https://www.roblox.com/share?code=ec604a40e5129842bcd22369f1630f4b&type=Server">Continuar</a>
-</div>
-
-</div>
+    <div class="success" id="success">
+      <h2>Formulário enviado!</h2>
+      <p style="color:var(--muted)">Obrigado por sua inscrição.</p>
+      <a class="btn" href="https://www.roblox.com/share?code=ec604a40e5129842bcd22369f1630f4b&type=Server">Continuar</a>
+    </div>
+  </div>
 </div>
 
 <script>
-const q2=document.getElementById('q2');
-const extra=document.getElementById('extraContainer');
-const form=document.getElementById('form');
-const success=document.getElementById('success');
-const btn=document.getElementById('submit');
-const words=["resolver","solucionar","consertar","contornar","lidar","ajustar","mediar","apaziguar"];
-q2.addEventListener('input',()=>{extra.classList.toggle('show',words.some(w=>q2.value.toLowerCase().includes(w)));});
-form.addEventListener('submit',(e)=>{e.preventDefault();form.style.display='none';success.style.display='block';});
-</script>
+/* ========= util ========== */
+function showBox(el){ el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
+function hideBox(el){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
+function setBoxContent(box, html){
+  if(!box) return;
+  box.innerHTML = html;
+}
+function parseNumberFrom(str){
+  const m = (str||'').replace(/\./g,'').match(/(\d+)(?:\s*(k|mil))?/i);
+  if(!m) return null;
+  let n = parseInt(m[1],10);
+  if(m[2]) n = n*1000;
+  return isNaN(n) ? null : n;
+}
 
+/* ========= elementos ========== */
+const form = document.getElementById('form');
+const success = document.getElementById('success');
+const submitBtn = document.getElementById('submit');
+
+/* Q1 */
+const q1extra = document.getElementById('q1extra');
+document.querySelectorAll('input[name="staff"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    if(r.value === 'Sim' && r.checked){
+      setBoxContent(q1extra, `
+        <label for="q1servidor">Em qual servidor e qual cargo você foi?</label>
+        <textarea id="q1servidor" name="q1servidor" placeholder="Ex.: Moderador no servidor X (2023)"></textarea>
+      `);
+      showBox(q1extra);
+    } else if(r.value === 'Não' && r.checked){
+      setBoxContent(q1extra, `
+        <label for="q1motivo">Por que quer ser staff agora?</label>
+        <textarea id="q1motivo" name="q1motivo" placeholder="Conte seu motivo e expectativa."></textarea>
+      `);
+      showBox(q1extra);
+    }
+  });
+});
+
+/* Q2 (palavras-chave) */
+const q2 = document.getElementById('q2');
+const q2extraBox = document.getElementById('q2extraBox');
+const q2words = ["resolver","solucionar","consertar","contornar","lidar","ajustar","mediar","apaziguar","fix","solve","handle"];
+q2.addEventListener('input', ()=>{
+  const v = (q2.value||'').toLowerCase();
+  if(q2words.some(w=>v.includes(w))){ showBox(q2extraBox); }
+  else { hideBox(q2extraBox); document.getElementById('q2extra').value=''; }
+});
+
+/* Q3 (qualidades) */
+const q3 = document.getElementById('q3');
+const q3extra = document.getElementById('q3extra');
+q3.addEventListener('input', ()=>{
+  const v = (q3.value||'').toLowerCase();
+  // Se citar trabalho em equipe/comunicação/organização, perguntar exemplo prático
+  if(/(equipe|time|comunica|organiza|respons|proativo|pro-ativo)/i.test(v)){
+    setBoxContent(q3extra, `
+      <label for="q3exemplo">Dê um exemplo prático de quando usou essa qualidade.</label>
+      <textarea id="q3exemplo" name="q3exemplo" placeholder="Conte uma situação real (curta)."></textarea>
+    `);
+    showBox(q3extra);
+  } else {
+    hideBox(q3extra); setBoxContent(q3extra,'');
+  }
+});
+
+/* Q4 (piores qualidades) */
+const q4 = document.getElementById('q4');
+const q4extra = document.getElementById('q4extra');
+q4.addEventListener('input', ()=>{
+  const v = (q4.value||'').toLowerCase();
+  // Se citar impulsivo, ansioso, teimoso etc., perguntar como mitiga
+  if(/(impulsiv|ansios|teimos|impaci|atras|procrast)/i.test(v)){
+    setBoxContent(q4extra, `
+      <label for="q4mitiga">Como você lida/mitiga essa dificuldade no dia a dia?</label>
+      <textarea id="q4mitiga" name="q4mitiga" placeholder="Fale sobre estratégias que você usa."></textarea>
+    `);
+    showBox(q4extra);
+  } else {
+    hideBox(q4extra); setBoxContent(q4extra,'');
+  }
+});
+
+/* Q5 (salário) */
+const q5 = document.getElementById('q5');
+const q5extra = document.getElementById('q5extra');
+q5.addEventListener('input', ()=>{
+  const n = parseNumberFrom(q5.value);
+  // Se pedir valor alto, pedir justificativa/negociação
+  if(n !== null && n > 300){
+    setBoxContent(q5extra, `
+      <label for="q5just">Nosso orçamento é limitado. Pode justificar esse valor ou sugerir um pacote (ex.: benefícios/horas)?</label>
+      <textarea id="q5just" name="q5just" placeholder="Explique sua expectativa e flexibilidade."></textarea>
+    `);
+    showBox(q5extra);
+  } else {
+    hideBox(q5extra); setBoxContent(q5extra,'');
+  }
+});
+
+/* Submissão apenas de UI */
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  submitBtn.textContent = 'Enviando...';
+  submitBtn.disabled = true;
+  setTimeout(()=>{
+    form.style.display='none';
+    success.style.display='block';
+    submitBtn.textContent = 'Enviar';
+    submitBtn.disabled = false;
+  }, 900);
+});
+</script>
 </body>
-</html>
+  </html>
