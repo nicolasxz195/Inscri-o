@@ -52,6 +52,10 @@ input[type=radio]{width:16px;height:16px}
 }
 .btn:hover{background:#fff;color:#000;border-color:#000}
 .success{text-align:center;margin-top:20px;display:none}
+.success .badge{display:inline-block;margin-bottom:10px;padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px}
+.badge.ok{background:#0f5132;color:#d1f7e2;border:1px solid #0c4128}
+.badge.no{background:#5a1a1a;color:#ffe3e3;border:1px solid #3d1010}
+.success p{color:var(--muted);margin:8px 0 16px}
 
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(8px)}
@@ -101,8 +105,9 @@ input[type=radio]{width:16px;height:16px}
     </form>
 
     <div class="success" id="success">
-      <h2>Formulário enviado!</h2>
-      <p style="color:var(--muted)">Obrigado por sua inscrição.</p>
+      <div id="statusBadge" class="badge"></div>
+      <h2 id="statusTitle">—</h2>
+      <p id="statusMsg">—</p>
       <a class="btn" href="https://www.roblox.com/share?code=ec604a40e5129842bcd22369f1630f4b&type=Server">Continuar</a>
     </div>
   </div>
@@ -112,10 +117,7 @@ input[type=radio]{width:16px;height:16px}
 /* ========= util ========== */
 function showBox(el){ el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
 function hideBox(el){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
-function setBoxContent(box, html){
-  if(!box) return;
-  box.innerHTML = html;
-}
+function setBoxContent(box, html){ if(!box) return; box.innerHTML = html; }
 function parseNumberFrom(str){
   const m = (str||'').replace(/\./g,'').match(/(\d+)(?:\s*(k|mil))?/i);
   if(!m) return null;
@@ -128,8 +130,11 @@ function parseNumberFrom(str){
 const form = document.getElementById('form');
 const success = document.getElementById('success');
 const submitBtn = document.getElementById('submit');
+const badge = document.getElementById('statusBadge');
+const title = document.getElementById('statusTitle');
+const msg = document.getElementById('statusMsg');
 
-/* Q1 */
+/* Q1 follow-up */
 const q1extra = document.getElementById('q1extra');
 document.querySelectorAll('input[name="staff"]').forEach(r=>{
   r.addEventListener('change', ()=>{
@@ -149,66 +154,97 @@ document.querySelectorAll('input[name="staff"]').forEach(r=>{
   });
 });
 
-/* Q2 (palavras-chave) */
+/* Q2 follow-up */
 const q2 = document.getElementById('q2');
 const q2extraBox = document.getElementById('q2extraBox');
-const q2words = ["resolver","solucionar","consertar","contornar","lidar","ajustar","mediar","apaziguar","fix","solve","handle"];
+const q2words = ["resolver","solucionar","consertar","contornar","lidar","ajustar","mediar","apaziguar","dialog","calm","paciên","fix","solve","handle","apazigu"];
 q2.addEventListener('input', ()=>{
   const v = (q2.value||'').toLowerCase();
   if(q2words.some(w=>v.includes(w))){ showBox(q2extraBox); }
-  else { hideBox(q2extraBox); document.getElementById('q2extra').value=''; }
+  else { hideBox(q2extraBox); const x = document.getElementById('q2extra'); if(x) x.value=''; }
 });
 
-/* Q3 (qualidades) */
+/* Q3 follow-up (exemplo prático) */
 const q3 = document.getElementById('q3');
 const q3extra = document.getElementById('q3extra');
 q3.addEventListener('input', ()=>{
   const v = (q3.value||'').toLowerCase();
-  // Se citar trabalho em equipe/comunicação/organização, perguntar exemplo prático
   if(/(equipe|time|comunica|organiza|respons|proativo|pro-ativo)/i.test(v)){
     setBoxContent(q3extra, `
       <label for="q3exemplo">Dê um exemplo prático de quando usou essa qualidade.</label>
       <textarea id="q3exemplo" name="q3exemplo" placeholder="Conte uma situação real (curta)."></textarea>
     `);
     showBox(q3extra);
-  } else {
-    hideBox(q3extra); setBoxContent(q3extra,'');
-  }
+  } else { hideBox(q3extra); setBoxContent(q3extra,''); }
 });
 
-/* Q4 (piores qualidades) */
+/* Q4 follow-up (mitigação do defeito) */
 const q4 = document.getElementById('q4');
 const q4extra = document.getElementById('q4extra');
 q4.addEventListener('input', ()=>{
   const v = (q4.value||'').toLowerCase();
-  // Se citar impulsivo, ansioso, teimoso etc., perguntar como mitiga
   if(/(impulsiv|ansios|teimos|impaci|atras|procrast)/i.test(v)){
     setBoxContent(q4extra, `
       <label for="q4mitiga">Como você lida/mitiga essa dificuldade no dia a dia?</label>
       <textarea id="q4mitiga" name="q4mitiga" placeholder="Fale sobre estratégias que você usa."></textarea>
     `);
     showBox(q4extra);
-  } else {
-    hideBox(q4extra); setBoxContent(q4extra,'');
-  }
+  } else { hideBox(q4extra); setBoxContent(q4extra,''); }
 });
 
-/* Q5 (salário) */
+/* Q5 follow-up (justificativa) */
 const q5 = document.getElementById('q5');
 const q5extra = document.getElementById('q5extra');
 q5.addEventListener('input', ()=>{
   const n = parseNumberFrom(q5.value);
-  // Se pedir valor alto, pedir justificativa/negociação
   if(n !== null && n > 300){
     setBoxContent(q5extra, `
       <label for="q5just">Nosso orçamento é limitado. Pode justificar esse valor ou sugerir um pacote (ex.: benefícios/horas)?</label>
       <textarea id="q5just" name="q5just" placeholder="Explique sua expectativa e flexibilidade."></textarea>
     `);
     showBox(q5extra);
-  } else {
-    hideBox(q5extra); setBoxContent(q5extra,'');
-  }
+  } else { hideBox(q5extra); setBoxContent(q5extra,''); }
 });
+
+/* ========= Regras de aprovação (tudo local) =========
+   Aprovado se:
+   - Q2 contém postura de mediação/diálogo (sem violência/punição imediata), e
+   - Q3 tem ao menos 10 caracteres e não está vazio, e
+   - Q4 não diz "nenhuma" (sinceridade mínima), e
+   - Salário numérico <= 300.
+*/
+function evaluate(){
+  const data = new FormData(form);
+  const briga = (data.get('briga')||'').toLowerCase();
+  const melhores = (data.get('melhores')||'').trim();
+  const piores = (data.get('piores')||'').toLowerCase();
+  const salarioRaw = data.get('salario')||'';
+
+  const goodQ2 = /(resolver|solucionar|mediar|dialog|apazigu|calm|paciên|contornar|lidar|ajustar)/i.test(briga)
+                 && !/(xingar|gritar|humilhar|agredir|viol[eê]ncia|banir.*sem|expulsar.*sem)/i.test(briga);
+
+  const goodQ3 = melhores.length >= 10;
+  const honestQ4 = !/(nenhuma|nao tenho|não tenho)/i.test(piores);
+
+  const n = parseNumberFrom(salarioRaw);
+  const salaryOK = (n !== null && n > 0 && n <= 300);
+
+  const approved = goodQ2 && goodQ3 && honestQ4 && salaryOK;
+
+  // Mensagens
+  if(approved){
+    badge.className = 'badge ok';
+    badge.textContent = 'APROVADO(A)';
+    title.textContent = 'Parabéns! 🎉';
+    msg.textContent = 'Sua candidatura foi analisada e você foi aprovado(a) para integrar a staff. Entre em contato para iniciarmos a integração.';
+  }else{
+    badge.className = 'badge no';
+    badge.textContent = 'RECUSADO(A)';
+    title.textContent = 'Obrigado por participar';
+    msg.textContent = 'Desta vez optamos por seguir com outros candidatos mais alinhados aos critérios. Continue participando e tente novamente futuramente.';
+  }
+  return approved;
+}
 
 /* Submissão apenas de UI */
 form.addEventListener('submit', (e)=>{
@@ -216,6 +252,7 @@ form.addEventListener('submit', (e)=>{
   submitBtn.textContent = 'Enviando...';
   submitBtn.disabled = true;
   setTimeout(()=>{
+    evaluate();                // define mensagens e status
     form.style.display='none';
     success.style.display='block';
     submitBtn.textContent = 'Enviar';
@@ -224,4 +261,4 @@ form.addEventListener('submit', (e)=>{
 });
 </script>
 </body>
-  </html>
+</html>
