@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inscrição</title>
+<style>
+:root{ --bg:#111; --muted:#bdbdbd; --accent:#fff; --focus:rgba(255,255,255,.12); --fade:500ms; }
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#0b0b0b 0%,#111 100%);
+  font-family:Inter,system-ui,Arial;color:var(--accent);
+}
+.wrap{width:100%;max-width:680px;padding:32px;animation:fadeIn .6s ease both}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.04);padding:32px;border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);backdrop-filter:blur(6px)
+}
+.intro{text-align:center;color:var(--muted);font-size:14px;margin-bottom:10px}
+h1{text-align:center;font-size:24px;margin:6px 0 14px;position:relative;display:inline-block}
+h1::after{
+  content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-10px;
+  width:0;height:3px;border-radius:3px;background:rgba(255,255,255,.6);
+  transition:width .45s cubic-bezier(.2,.9,.3,1);
+}
+.card:hover h1::after{width:72px}
+
+label{display:block;margin-top:16px;margin-bottom:8px;font-weight:600;font-size:13px}
+textarea,input[type=text]{
+  width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);color:var(--accent);font-size:14px;
+  transition:box-shadow .18s,transform .12s,border-color .16s;min-height:72px;resize:vertical;
+}
+textarea:focus,input[type=text]:focus{border-color:#fff;transform:translateY(-2px);box-shadow:0 6px 24px var(--focus)}
+
+.radio-row{display:flex;gap:18px;margin-top:6px}
+.radio-row label{font-weight:500;color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}
+input[type=radio]{width:16px;height:16px}
+
+.extra{
+  margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(15px);
+  transition:opacity var(--fade),transform var(--fade),max-height var(--fade);
+}
+.extra.show{max-height:260px;opacity:1;transform:translateY(0)}
+
+.actions{text-align:center;margin-top:22px}
+.btn{
+  padding:12px 20px;background:#000;color:#fff;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+  font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 6px 18px rgba(0,0,0,.5);
+}
+.btn:hover{background:#fff;color:#000;border-color:#000}
+
+.success{text-align:center;margin-top:20px;display:none}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+
+<div class="intro">Preencha o formulário para se inscrever</div>
+<h1>Inscrição</h1>
+
+<form id="form">
+<label>Você já foi staff de um server?</label>
+<div class="radio-row">
+  <label><input type="radio" name="staff" value="Sim" required> Sim</label>
+  <label><input type="radio" name="staff" value="Não" required> Não</label>
+</div>
+
+<label>Como você reagiria com uma briga no servidor?</label>
+<textarea id="q2" name="briga" placeholder="Explique..." required></textarea>
+
+<div id="extraContainer" class="extra">
+  <label>Mas e se não funcionar?</label>
+  <textarea id="q2extra" name="q2extra" placeholder="O que faria então?"></textarea>
+</div>
+
+<label>Quais são suas melhores qualidades?</label>
+<textarea name="melhores" required></textarea>
+
+<label>Suas piores qualidades?</label>
+<textarea name="piores" required></textarea>
+
+<label>Que salário você deseja?</label>
+<input type="text" name="salario" required>
+
+<div class="actions"><button class="btn" id="submit">Enviar</button></div>
+</form>
+
+<div class="success" id="success">
+<h2>Formulário enviado!</h2>
+<a class="btn" href="https://www.roblox.com/share?code=ec604a40e5129842bcd22369f1630f4b&type=Server">Continuar</a>
+</div>
+
+</div>
+</div>
+
+<script>
+const q2=document.getElementById('q2');
+const extra=document.getElementById('extraContainer');
+const form=document.getElementById('form');
+const success=document.getElementById('success');
+const btn=document.getElementById('submit');
+const words=["resolver","solucionar","consertar","contornar","lidar","ajustar","mediar","apaziguar"];
+q2.addEventListener('input',()=>{extra.classList.toggle('show',words.some(w=>q2.value.toLowerCase().includes(w)));});
+form.addEventListener('submit',(e)=>{e.preventDefault();form.style.display='none';success.style.display='block';});
+</script>
+
+</body>
+</html>
